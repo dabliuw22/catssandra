@@ -1,0 +1,13 @@
+version: "3"
+services:
+  cassandra:
+    image: cassandra
+    restart: always
+    container_name: "catssandra"
+    environment:
+      - MAX_HEAP_SIZE=256M
+      - HEAP_NEWSIZE=128M
+    ports:
+      - "9042:9042"
+    volumes:
+      - ./out/cassandra_data:/var/lib/cassandra
