@@ -29,9 +29,12 @@ object App extends IOApp {
         _ <- client
               .command(command(UUID.randomUUID().toString, "p22", 100))
         all <- client.execute(queryAll(), f)
+        _ <- logger.info(s"ALL: $all")
+        stream <- client.stream(queryAll(), f).compile.toList
+        _ <- logger.info(s"STREAM: $stream")
         option <- client
                    .option(queryOne("491ae396-42e7-4483-a3ef-e729c486980f"), f)
-        _ <- logger.info(s"ALL: $all, OPTION: $option")
+        _ <- logger.info(s"OPTION: $option")
       } yield ExitCode.Success
     }
 

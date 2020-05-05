@@ -4,6 +4,7 @@ object Dependencies {
 
   object Versions {
     lazy val cats = "2.1.1"
+    lazy val fs2 = "2.2.1"
     lazy val datastax = "4.6.0"
     lazy val log4cats = "1.0.1"
     lazy val scalaLog = "3.9.2"
@@ -20,6 +21,7 @@ object Dependencies {
 
   object Libraries {
     private def cats(artifact: String): ModuleID = "org.typelevel" %% artifact % Versions.cats
+    private def fs2(artifact: String): ModuleID = "co.fs2" %% artifact % Versions.fs2
     private def datastax(artifact: String): ModuleID = "com.datastax.oss" % artifact % Versions.datastax
     private def log4cats(artifact: String): ModuleID = "io.chrisdavenport" %% artifact % Versions.log4cats
     private def scalaLog(artifact: String): ModuleID = "com.typesafe.scala-logging" %% artifact % Versions.scalaLog
@@ -29,6 +31,7 @@ object Dependencies {
     lazy val catsKernel = cats("cats-kernel")
     lazy val catsCore = cats("cats-core")
     lazy val catsEffect = cats("cats-effect")
+    lazy val fs2Core = fs2("fs2-core")
     lazy val datastaxCore = datastax("java-driver-core")
     lazy val scalaLogging = scalaLog("scala-logging")
     lazy val logbackClassic = logback("logback-classic")

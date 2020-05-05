@@ -25,6 +25,7 @@ lazy val dependencies = Seq(
   Libraries.catsKernel,
   Libraries.catsMacros,
   Libraries.catsEffect,
+  Libraries.fs2Core,
   Libraries.datastaxCore,
   Libraries.scalaLogging,
   Libraries.logbackClassic,

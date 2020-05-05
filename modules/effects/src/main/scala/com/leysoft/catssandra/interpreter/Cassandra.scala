@@ -8,6 +8,7 @@ import com.datastax.oss.driver.api.core.cql.{AsyncResultSet, Row}
 import com.leysoft.catssandra.algebra._
 import com.leysoft.catssandra.connection.Session
 import com.leysoft.catssandra.effect.AsyncTask
+import fs2.{Chunk, Stream}
 
 import scala.jdk.CollectionConverters._
 
@@ -23,6 +24,9 @@ object Cassandra {
     override def execute[A](query: Query, fa: Row => A): F[List[A]] =
       async(query.value).flatMap(rec).map(_.map(fa))
 
+    override def stream[A](query: Query, fa: Row => A): Stream[F, A] =
+      Stream.eval(async(query.value)).flatMap(rs => chunk(rs)).map(fa)
+
     override def option[A](query: Query, fa: Row => A): F[Option[A]] =
       async(query.value).map(_.some.flatMap(rs => Option(rs.one)).map(fa))
 
@@ -31,17 +35,30 @@ object Cassandra {
         Async[F].pure(session.cqlSession.executeAsync(cql))
       )
 
-    private def rec(rs: AsyncResultSet): F[List[Row]] =
+    private def rec(rs: AsyncResultSet): F[List[Row]] = {
+      val current = rows(rs)
       Async[F].defer {
         if (rs.hasMorePages)
           AsyncTask[F, AsyncResultSet](Async[F].pure(rs.fetchNextPage))
             .flatMap(rec)
-            .map(rows => current(rs) ::: rows)
+            .map(r => current ::: r)
         else
-          Async[F].pure(current(rs))
+          Async[F].pure(current)
       }
+    }
 
-    private def current(rs: AsyncResultSet): List[Row] =
+    private def chunk(rs: AsyncResultSet): Stream[F, Row] = {
+      val current = Stream
+        .eval(Async[F].pure(rows(rs)))
+        .flatMap(res => Stream.chunk(Chunk.seq(res)))
+      if (rs.hasMorePages)
+        Stream
+          .eval(AsyncTask(Async[F].pure(rs.fetchNextPage)))
+          .flatMap(res => current ++ chunk(res))
+      else current
+    }
+
+    private def rows(rs: AsyncResultSet): List[Row] =
       rs.currentPage.asScala.toList
   }
 
