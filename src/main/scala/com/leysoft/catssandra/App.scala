@@ -23,9 +23,9 @@ object App extends IOApp {
     )
 
   override def run(args: List[String]): IO[ExitCode] =
-    Session(keyspace = Some("test")).use { session =>
+    Session.apply[IO](keyspace = Some("test")).use { session =>
       for {
-        client <- Cassandra(session)
+        client <- Cassandra.apply[IO](session)
         _ <- client
               .command(command(UUID.randomUUID().toString, "p22", 100))
         all <- client.execute(queryAll(), f)
@@ -43,6 +43,5 @@ object App extends IOApp {
   def command(id: String, name: String, stock: Float): Command =
     Command(s"""
       |INSERT INTO test.products(id, name, stock)
-      |VALUES ('$id', '$name', $stock)
-      |""".stripMargin)
+      |VALUES ('$id', '$name', $stock)""".stripMargin)
 }

@@ -1,6 +1,7 @@
 package com.leysoft.catssandra.interpreter
 
 import cats.effect.{Async, ContextShift}
+import cats.syntax.flatMap._
 import cats.syntax.functor._
 import cats.syntax.option._
 import com.datastax.oss.driver.api.core.cql.{AsyncResultSet, Row}
@@ -12,7 +13,7 @@ import scala.jdk.CollectionConverters._
 
 object Cassandra {
 
-  private[catssandra] final class AsyncCassandraClient[F[_]: Async: ContextShift](
+  private[catssandra] final class AsyncCassandraClient[F[_]: Async: ContextShift] private (
     session: Session
   ) extends CassandraClient[F] {
 
@@ -20,7 +21,7 @@ object Cassandra {
       async(command.value).map(_ => ())
 
     override def execute[A](query: Query, fa: Row => A): F[List[A]] =
-      async(query.value).map(_.currentPage.asScala.toList.map(fa))
+      async(query.value).flatMap(rec).map(_.map(fa))
 
     override def option[A](query: Query, fa: Row => A): F[Option[A]] =
       async(query.value).map(_.some.flatMap(rs => Option(rs.one)).map(fa))
@@ -29,10 +30,31 @@ object Cassandra {
       AsyncTask[F, AsyncResultSet](
         Async[F].pure(session.cqlSession.executeAsync(cql))
       )
+
+    private def rec(rs: AsyncResultSet): F[List[Row]] =
+      Async[F].defer {
+        if (rs.hasMorePages)
+          AsyncTask[F, AsyncResultSet](Async[F].pure(rs.fetchNextPage))
+            .flatMap(rec)
+            .map(rows => current(rs) ::: rows)
+        else
+          Async[F].pure(current(rs))
+      }
+
+    private def current(rs: AsyncResultSet): List[Row] =
+      rs.currentPage.asScala.toList
   }
 
-  def apply[F[_]: ContextShift](
+  private object AsyncCassandraClient {
+
+    def make[F[_]: Async: ContextShift](
+      session: Session
+    ): F[CassandraClient[F]] =
+      Async[F].delay(new AsyncCassandraClient(session))
+  }
+
+  def apply[F[_]: Async: ContextShift](
     session: Session
-  )(implicit F: Async[F]): F[CassandraClient[F]] =
-    F.pure(new AsyncCassandraClient[F](session))
+  ): F[CassandraClient[F]] =
+    AsyncCassandraClient.make[F](session)
 }
