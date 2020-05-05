@@ -15,6 +15,13 @@ trait CassandraClient[F[_]] {
   def option[A](query: Query, fa: Row => A): F[Option[A]]
 }
 
+final case class Cql(value: String) {
+
+  def command: Command = Command(value)
+
+  def query: Query = Query(value)
+}
+
 final case class Command(value: String)
 
 final case class Query(value: String)
