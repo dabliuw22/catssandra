@@ -19,7 +19,21 @@ package object connection {
       new Node(host, port)
   }
 
-  case class Session private (cqlSession: CqlSession)
+  trait Session {
+
+    def cql: CqlSession
+  }
+
+  private case class DefaultSession private (cqlSession: CqlSession)
+      extends Session {
+
+    override def cql: CqlSession = cqlSession
+  }
+
+  private object DefaultSession {
+
+    def apply(cqlSession: CqlSession): Session = new DefaultSession(cqlSession)
+  }
 
   object Session {
 
@@ -51,6 +65,6 @@ package object connection {
             cqlSession.build()
           }
         )
-        .map(new Session(_))
+        .map(DefaultSession(_))
   }
 }

@@ -33,7 +33,7 @@ object Cassandra {
 
     private def async(cql: String): F[AsyncResultSet] =
       AsyncTask[F, AsyncResultSet](
-        Async[F].pure(session.cqlSession.executeAsync(cql))
+        Async[F].pure(session.cql.executeAsync(cql))
       )
 
     private def rec(rs: AsyncResultSet): F[List[Row]] = {
