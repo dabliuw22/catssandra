@@ -4,17 +4,19 @@ import java.util.UUID
 
 import cats.effect.{ExitCode, IO, IOApp}
 import com.datastax.oss.driver.api.core.cql.Row
-import com.leysoft.catssandra.algebra.{Command, Cql, Query}
 import com.leysoft.catssandra.connection.Session
 import com.leysoft.catssandra.interpreter.Cassandra
+import com.leysoft.catssandra.syntax._
 import io.chrisdavenport.log4cats.Logger
 import io.chrisdavenport.log4cats.slf4j.Slf4jLogger
 
 object App extends IOApp {
 
-  val logger: Logger[IO] = Slf4jLogger.getLoggerFromName[IO]("App")
+  private val logger: Logger[IO] = Slf4jLogger.getLoggerFromName[IO]("App")
 
-  val f: Row => (String, String, Float) =
+  private type Product = (String, String, Float)
+
+  private implicit val f: Row => Product =
     row =>
       (
         row.getString("id"),
@@ -28,23 +30,25 @@ object App extends IOApp {
         client <- Cassandra.apply[IO](session)
         _ <- client
               .command(command(UUID.randomUUID().toString, "p22", 100))
-        all <- client.execute(queryAll, f)
+        all <- client.execute[Product](queryAll)
         _ <- logger.info(s"ALL: $all")
-        stream <- client.stream(queryAll, f).compile.toList
+        stream <- client.stream[Product](queryAll).compile.toList
         _ <- logger.info(s"STREAM: $stream")
         option <- client
-                   .option(queryOne("491ae396-42e7-4483-a3ef-e729c486980f"), f)
+                   .option[Product](
+                     queryOne("491ae396-42e7-4483-a3ef-e729c486980f")
+                   )
         _ <- logger.info(s"OPTION: $option")
       } yield ExitCode.Success
     }
 
-  def queryAll: Query = Cql("SELECT * FROM test.products").query
+  def queryAll: Query = cql("SELECT * FROM test.products").query
 
   def queryOne(id: String): Query =
-    Cql(s"SELECT * FROM test.products WHERE id = '$id'").query
+    cql(s"SELECT * FROM test.products WHERE id = '$id'").query
 
   def command(id: String, name: String, stock: Float): Command =
-    Cql(s"""
+    cql(s"""
       |INSERT INTO test.products(id, name, stock)
       |VALUES ('$id', '$name', $stock)""".stripMargin).command
 }

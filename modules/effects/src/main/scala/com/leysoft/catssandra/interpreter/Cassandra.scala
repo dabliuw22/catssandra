@@ -5,9 +5,10 @@ import cats.syntax.flatMap._
 import cats.syntax.functor._
 import cats.syntax.option._
 import com.datastax.oss.driver.api.core.cql.{AsyncResultSet, Row}
-import com.leysoft.catssandra.algebra._
+import com.leysoft.catssandra.algebra.CassandraClient
 import com.leysoft.catssandra.connection.Session
 import com.leysoft.catssandra.effect.AsyncTask
+import com.leysoft.catssandra.syntax._
 import fs2.{Chunk, Stream}
 
 import scala.jdk.CollectionConverters._
@@ -21,13 +22,13 @@ object Cassandra {
     override def command(command: Command): F[Unit] =
       async(command.value).map(_ => ())
 
-    override def execute[A](query: Query, fa: Row => A): F[List[A]] =
+    override def execute[A](query: Query)(implicit fa: Row => A): F[List[A]] =
       async(query.value).flatMap(rec).map(_.map(fa))
 
-    override def stream[A](query: Query, fa: Row => A): Stream[F, A] =
+    override def stream[A](query: Query)(implicit fa: Row => A): Stream[F, A] =
       Stream.eval(async(query.value)).flatMap(rs => chunk(rs)).map(fa)
 
-    override def option[A](query: Query, fa: Row => A): F[Option[A]] =
+    override def option[A](query: Query)(implicit fa: Row => A): F[Option[A]] =
       async(query.value).map(_.some.flatMap(rs => Option(rs.one)).map(fa))
 
     private def async(cql: String): F[AsyncResultSet] =
