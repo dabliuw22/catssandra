@@ -2,7 +2,21 @@ package com.leysoft.catssandra
 
 package object syntax {
 
-  def cql(value: String): Cql = Cql(value)
+  object CqlInterpolator {}
+
+  implicit class CqlStringContext(val sc: StringContext) extends AnyVal {
+
+    def cql(args: Any*): Cql = {
+      val strings = sc.parts.iterator
+      val expressions = args.iterator
+      val buffer = new StringBuilder
+      while (expressions.hasNext) {
+        buffer.append(expressions.next.toString)
+        buffer.append(strings.next)
+      }
+      Cql(buffer.toString)
+    }
+  }
 
   final class Cql private (val value: String) {
 

@@ -42,13 +42,11 @@ object App extends IOApp {
       } yield ExitCode.Success
     }
 
-  def queryAll: Query = cql("SELECT * FROM test.products").query
+  def queryAll: Query = cql"SELECT * FROM test.products".query
 
   def queryOne(id: String): Query =
-    cql(s"SELECT * FROM test.products WHERE id = '$id'").query
+    cql"SELECT * FROM test.products WHERE id = '$id'".query
 
   def command(id: String, name: String, stock: Float): Command =
-    cql(s"""
-      |INSERT INTO test.products(id, name, stock)
-      |VALUES ('$id', '$name', $stock)""".stripMargin).command
+    cql"INSERT INTO test.products(id, name, stock) VALUES ('$id', '$name', $stock)".command
 }

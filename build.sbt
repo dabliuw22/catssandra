@@ -20,27 +20,11 @@ lazy val options = Seq(
   "-language:higherKinds"
 )
 
-lazy val dependencies = Seq(
-  Libraries.catsCore,
-  Libraries.catsKernel,
-  Libraries.catsMacros,
-  Libraries.catsEffect,
-  Libraries.fs2Core,
-  Libraries.datastaxCore,
-  Libraries.scalaLogging,
-  Libraries.logbackClassic,
-  Libraries.log4CatsCore,
-  Libraries.log4CatsSlf4j,
-  Libraries.Testing.scalaTest,
-  Libraries.Testing.scalaCheck,
-)
-
 lazy val root = (project in file("."))
   .settings(commonSettings: _*)
   .settings(
     name := "catssandra",
-    scalacOptions ++= options,
-    libraryDependencies ++= dependencies
+    scalacOptions ++= options
   )
   .aggregate(core, effects)
   .dependsOn(core, effects)
@@ -50,7 +34,15 @@ lazy val core = (project in file("modules/core"))
   .settings(
     name := "catssandra-core",
     scalacOptions ++= options,
-    libraryDependencies ++= dependencies
+    libraryDependencies ++= Seq(
+      Libraries.catsCore,
+      Libraries.catsEffect,
+      Libraries.datastaxCore,
+      Libraries.scalaLogging,
+      Libraries.logbackClassic,
+      Libraries.Testing.scalaTest,
+      Libraries.Testing.scalaCheck,
+    )
   )
 
 lazy val effects = (project in file("modules/effects"))
@@ -58,6 +50,19 @@ lazy val effects = (project in file("modules/effects"))
   .settings(
     name := "catssandra-effects",
     scalacOptions ++= options,
-    libraryDependencies ++= dependencies
+    libraryDependencies ++= Seq(
+      Libraries.catsCore,
+      Libraries.catsKernel,
+      Libraries.catsMacros,
+      Libraries.catsEffect,
+      Libraries.fs2Core,
+      Libraries.datastaxCore,
+      Libraries.scalaLogging,
+      Libraries.logbackClassic,
+      Libraries.log4CatsCore,
+      Libraries.log4CatsSlf4j,
+      Libraries.Testing.scalaTest,
+      Libraries.Testing.scalaCheck,
+    )
   )
   .dependsOn(core)

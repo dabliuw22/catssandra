@@ -22,7 +22,7 @@ protected[interpreter] final class AsyncCassandraClientSpec
     "Return Two Records" in {
       Cassandra
         .apply[IO](sessionRec)
-        .flatMap(client => client.execute[Row](cql("SELECT * FROM test").query))
+        .flatMap(client => client.execute[Row](cql"SELECT * FROM test".query))
         .map(list => assert(list.size == 2))
         .unsafeToFuture
     }
@@ -32,7 +32,7 @@ protected[interpreter] final class AsyncCassandraClientSpec
     "Return One Records" in {
       Cassandra
         .apply[IO](session)
-        .flatMap(client => client.execute[Row](cql("SELECT * FROM test").query))
+        .flatMap(client => client.execute[Row](cql"SELECT * FROM test".query))
         .map(list => assert(list.size == 1))
         .unsafeToFuture
     }
@@ -42,7 +42,7 @@ protected[interpreter] final class AsyncCassandraClientSpec
     "Return Two Records" in {
       fs2.Stream
         .eval(Cassandra.apply[IO](sessionRec))
-        .flatMap(client => client.stream[Row](cql("SELECT * FROM test").query))
+        .flatMap(client => client.stream[Row](cql"SELECT * FROM test".query))
         .compile
         .toList
         .map(list => assert(list.size == 2))
@@ -54,7 +54,7 @@ protected[interpreter] final class AsyncCassandraClientSpec
     "Return One Records" in {
       fs2.Stream
         .eval(Cassandra.apply[IO](session))
-        .flatMap(client => client.stream[Row](cql("SELECT * FROM test").query))
+        .flatMap(client => client.stream[Row](cql"SELECT * FROM test".query))
         .compile
         .toList
         .map(list => assert(list.size == 1))
