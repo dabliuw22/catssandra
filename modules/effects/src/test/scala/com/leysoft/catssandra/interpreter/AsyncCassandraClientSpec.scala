@@ -1,20 +1,13 @@
 package com.leysoft.catssandra.interpreter
 
-import cats.effect.{ContextShift, IO, Timer}
+import cats.effect.IO
 import com.datastax.oss.driver.api.core.CqlSession
 import com.datastax.oss.driver.api.core.cql.Row
+import com.leysoft.catssandra.AsyncSpec
 import com.leysoft.catssandra.connection.Session
 import com.leysoft.catssandra.syntax._
-import org.scalatest.wordspec.AsyncWordSpec
 
-import scala.concurrent.ExecutionContext
-
-protected[interpreter] final class AsyncCassandraClientSpec
-    extends AsyncWordSpec {
-
-  implicit val cs: ContextShift[IO] = IO.contextShift(ExecutionContext.global)
-
-  implicit val timer: Timer[IO] = IO.timer(ExecutionContext.global)
+protected[interpreter] final class AsyncCassandraClientSpec extends AsyncSpec {
 
   implicit val f: Row => Row = r => r
 

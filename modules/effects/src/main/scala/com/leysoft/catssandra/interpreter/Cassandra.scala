@@ -20,7 +20,7 @@ object Cassandra {
   ) extends CassandraClient[F] {
 
     override def command(command: Command): F[Unit] =
-      async(command.value).map(_ => ())
+      async(command.value).void
 
     override def execute[A](query: Query)(implicit fa: Row => A): F[List[A]] =
       async(query.value).flatMap(rec).map(_.map(fa))

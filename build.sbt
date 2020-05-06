@@ -26,8 +26,8 @@ lazy val root = (project in file("."))
     name := "catssandra",
     scalacOptions ++= options
   )
-  .aggregate(core, effects)
-  .dependsOn(core, effects)
+  .aggregate(core, effects, test)
+  .dependsOn(core, effects, test)
 
 lazy val core = (project in file("modules/core"))
   .settings(commonSettings: _*)
@@ -42,8 +42,12 @@ lazy val core = (project in file("modules/core"))
       Libraries.logbackClassic,
       Libraries.Testing.scalaTest,
       Libraries.Testing.scalaCheck,
+      Libraries.Testing.scalaTestPlus,
+      Libraries.Testing.scalaCheckToolboxMagic,
+      Libraries.Testing.scalaCheckToolboxDatetime,
+      Libraries.Testing.scalaCheckToolboxCombinators
     )
-  )
+  ).dependsOn(test)
 
 lazy val effects = (project in file("modules/effects"))
   .settings(commonSettings: _*)
@@ -63,6 +67,27 @@ lazy val effects = (project in file("modules/effects"))
       Libraries.log4CatsSlf4j,
       Libraries.Testing.scalaTest,
       Libraries.Testing.scalaCheck,
+      Libraries.Testing.scalaTestPlus,
+      Libraries.Testing.scalaCheckToolboxMagic,
+      Libraries.Testing.scalaCheckToolboxDatetime,
+      Libraries.Testing.scalaCheckToolboxCombinators
     )
   )
-  .dependsOn(core)
+  .dependsOn(core, test)
+
+lazy val test = (project in file("modules/test"))
+  .settings(commonSettings: _*)
+  .settings(
+    name := "catssandra-test",
+    scalacOptions ++= options,
+    libraryDependencies ++= Seq(
+      Libraries.catsCore,
+      Libraries.catsEffect,
+      Libraries.Testing.scalaTest,
+      Libraries.Testing.scalaCheck,
+      Libraries.Testing.scalaTestPlus,
+      Libraries.Testing.scalaCheckToolboxMagic,
+      Libraries.Testing.scalaCheckToolboxDatetime,
+      Libraries.Testing.scalaCheckToolboxCombinators
+    )
+  )
