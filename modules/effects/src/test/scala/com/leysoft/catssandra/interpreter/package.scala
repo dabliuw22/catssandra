@@ -11,14 +11,24 @@ import com.datastax.oss.driver.api.core.`type`.codec.registry.CodecRegistry
 import com.datastax.oss.driver.api.core.`type`.reflect.GenericType
 import com.datastax.oss.driver.api.core.context.DriverContext
 import com.datastax.oss.driver.api.core.cql.{AsyncCqlSession, AsyncResultSet, ColumnDefinitions, ExecutionInfo, Row}
+import com.datastax.oss.driver.api.core.data.GettableByName
 import com.datastax.oss.driver.api.core.detach.AttachmentPoint
 import com.datastax.oss.driver.api.core.metadata.Metadata
 import com.datastax.oss.driver.api.core.metrics.Metrics
 import com.datastax.oss.driver.api.core.session.Request
+import com.leysoft.catssandra.connection.Session
 
 package object interpreter {
 
-  final class FakeRow extends Row {
+  protected[interpreter] def sessionRec: Session = new Session {
+    override def cql: CqlSession = new FakeRecCqlSession
+  }
+
+  protected[interpreter] def session: Session = new Session {
+    override def cql: CqlSession = new FakeCqlSession
+  }
+
+  private final class FakeRow extends Row with GettableByName {
 
     override def getColumnDefinitions: ColumnDefinitions = ???
 
@@ -43,9 +53,11 @@ package object interpreter {
     override def isDetached: Boolean = ???
 
     override def attach(attachmentPoint: AttachmentPoint): Unit = ???
+
+    override def getString(name: String): String = "test"
   }
 
-  final class FakeRecAsyncResultSet() extends AsyncResultSet {
+  private final class FakeRecAsyncResultSet() extends AsyncResultSet {
     override def wasApplied(): Boolean = ???
 
     override def getColumnDefinitions: ColumnDefinitions = ???
@@ -63,7 +75,7 @@ package object interpreter {
       CompletableFuture.supplyAsync(() => new FakeAsyncResultSet)
   }
 
-  final class FakeAsyncResultSet() extends AsyncResultSet {
+  private final class FakeAsyncResultSet() extends AsyncResultSet {
     override def wasApplied(): Boolean = ???
 
     override def getColumnDefinitions: ColumnDefinitions = ???
@@ -80,7 +92,9 @@ package object interpreter {
     override def fetchNextPage(): CompletionStage[AsyncResultSet] = ???
   }
 
-  final class FakeRecCqlSession extends CqlSession with AsyncCqlSession {
+  private final class FakeRecCqlSession
+      extends CqlSession
+      with AsyncCqlSession {
 
     override def executeAsync(query: String): CompletionStage[AsyncResultSet] =
       CompletableFuture.supplyAsync(() => new FakeRecAsyncResultSet)
@@ -118,7 +132,7 @@ package object interpreter {
     override def forceCloseAsync(): CompletionStage[Void] = ???
   }
 
-  final class FakeCqlSession extends CqlSession with AsyncCqlSession {
+  private final class FakeCqlSession extends CqlSession with AsyncCqlSession {
 
     override def executeAsync(query: String): CompletionStage[AsyncResultSet] =
       CompletableFuture.supplyAsync(() => new FakeAsyncResultSet)
