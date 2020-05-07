@@ -15,7 +15,7 @@ protected[interpreter] final class AsyncCassandraClientSpec extends AsyncSpec {
         .apply[IO](sessionRec)
         .flatMap(
           client =>
-            client.execute[String](cql"SELECT test FROM test.tests".query)
+            client.execute[String](cql("SELECT test FROM test.tests").query)
         )
         .map(list => assert(list.size == 2))
         .unsafeToFuture
@@ -28,7 +28,7 @@ protected[interpreter] final class AsyncCassandraClientSpec extends AsyncSpec {
         .apply[IO](session)
         .flatMap(
           client =>
-            client.execute[String](cql"SELECT test FROM test.tests".query)
+            client.execute[String](cql("SELECT test FROM test.tests").query)
         )
         .map(list => assert(list.size == 1))
         .unsafeToFuture
@@ -41,7 +41,7 @@ protected[interpreter] final class AsyncCassandraClientSpec extends AsyncSpec {
         .eval(Cassandra.apply[IO](sessionRec))
         .flatMap(
           client =>
-            client.stream[String](cql"SELECT test FROM test.tests".query)
+            client.stream[String](cql("SELECT test FROM test.tests").query)
         )
         .compile
         .toList
@@ -56,7 +56,7 @@ protected[interpreter] final class AsyncCassandraClientSpec extends AsyncSpec {
         .eval(Cassandra.apply[IO](session))
         .flatMap(
           client =>
-            client.stream[String](cql"SELECT test FROM test.tests".query)
+            client.stream[String](cql("SELECT test FROM test.tests").query)
         )
         .compile
         .toList

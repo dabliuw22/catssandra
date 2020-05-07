@@ -25,7 +25,7 @@ object App extends IOApp {
   }
 
   override def run(args: List[String]): IO[ExitCode] =
-    Session.apply[IO](keyspace = Some("test")).use { session =>
+    Session.apply[IO]().use { session =>
       for {
         client <- Cassandra.apply[IO](session)
         _ <- client
@@ -42,11 +42,13 @@ object App extends IOApp {
       } yield ExitCode.Success
     }
 
-  def queryAll: Query = cql"SELECT * FROM test.products".query
+  def queryAll: Query = cql("SELECT * FROM test.products").query
 
   def queryOne(id: String): Query =
-    cql"SELECT * FROM test.products WHERE id = '$id'".query
+    cql(s"SELECT * FROM test.products WHERE id = '$id'").query
 
   def command(id: String, name: String, stock: Float): Command =
-    cql"INSERT INTO test.products(id, name, stock) VALUES ('$id', '$name', $stock)".command
+    cql(
+      s"INSERT INTO test.products(id, name, stock) VALUES ('$id', '$name', $stock)"
+    ).command
 }

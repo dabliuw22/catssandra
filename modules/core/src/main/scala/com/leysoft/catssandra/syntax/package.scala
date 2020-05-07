@@ -14,20 +14,6 @@ package object syntax {
     final def instance[A](fa: Row => A): Decoder[A] = (row: Row) => fa(row)
   }
 
-  implicit class CqlStringContext(val sc: StringContext) extends AnyVal {
-
-    def cql(args: Any*): Cql = {
-      val strings = sc.parts.iterator
-      val expressions = args.iterator
-      val buffer = new StringBuilder
-      while (expressions.hasNext) {
-        buffer.append(expressions.next.toString)
-        buffer.append(strings.next)
-      }
-      Cql(buffer.toString)
-    }
-  }
-
   final class Cql private (val value: String) {
 
     def command: Command = Command(value)
@@ -39,6 +25,8 @@ package object syntax {
 
     def apply(value: String): Cql = new Cql(value)
   }
+
+  def cql(value: String): Cql = Cql(value)
 
   final class Command private (val value: String)
 
