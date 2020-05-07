@@ -22,14 +22,24 @@ object Cassandra {
     override def command(command: Command): F[Unit] =
       async(command.value).void
 
-    override def execute[A](query: Query)(implicit fa: Row => A): F[List[A]] =
-      async(query.value).flatMap(rec).map(_.map(fa))
+    override def execute[A](
+      query: Query
+    )(implicit decoder: Decoder[A]): F[List[A]] =
+      async(query.value).flatMap(rec).map(_.map(decoder.decode))
 
-    override def stream[A](query: Query)(implicit fa: Row => A): Stream[F, A] =
-      Stream.eval(async(query.value)).flatMap(rs => chunk(rs)).map(fa)
+    override def stream[A](
+      query: Query
+    )(implicit decoder: Decoder[A]): Stream[F, A] =
+      Stream
+        .eval(async(query.value))
+        .flatMap(rs => chunk(rs))
+        .map(decoder.decode)
 
-    override def option[A](query: Query)(implicit fa: Row => A): F[Option[A]] =
-      async(query.value).map(_.some.flatMap(rs => Option(rs.one)).map(fa))
+    override def option[A](
+      query: Query
+    )(implicit decoder: Decoder[A]): F[Option[A]] =
+      async(query.value)
+        .map(_.some.flatMap(rs => Option(rs.one)).map(decoder.decode))
 
     private def async(cql: String): F[AsyncResultSet] =
       AsyncTask[F, AsyncResultSet](

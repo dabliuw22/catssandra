@@ -3,7 +3,6 @@ package com.leysoft.catssandra
 import java.util.UUID
 
 import cats.effect.{ExitCode, IO, IOApp}
-import com.datastax.oss.driver.api.core.cql.Row
 import com.leysoft.catssandra.connection.Session
 import com.leysoft.catssandra.interpreter.Cassandra
 import com.leysoft.catssandra.syntax._
@@ -16,13 +15,14 @@ object App extends IOApp {
 
   private type Product = (String, String, Float)
 
-  private implicit val f: Row => Product =
+  private implicit val decoder: Decoder[Product] = Decoder.instance[Product] {
     row =>
       (
         row.getString("id"),
         row.getString("name"),
         row.getFloat("stock")
-    )
+      )
+  }
 
   override def run(args: List[String]): IO[ExitCode] =
     Session.apply[IO](keyspace = Some("test")).use { session =>

@@ -1,8 +1,18 @@
 package com.leysoft.catssandra
 
+import com.datastax.oss.driver.api.core.cql.Row
+
 package object syntax {
 
-  object CqlInterpolator {}
+  trait Decoder[A] {
+
+    def decode(row: Row): A
+  }
+
+  object Decoder {
+
+    final def instance[A](fa: Row => A): Decoder[A] = (row: Row) => fa(row)
+  }
 
   implicit class CqlStringContext(val sc: StringContext) extends AnyVal {
 

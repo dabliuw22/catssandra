@@ -9,7 +9,7 @@ import com.leysoft.catssandra.syntax._
 
 protected[interpreter] final class AsyncCassandraClientSpec extends AsyncSpec {
 
-  implicit val f: Row => Row = r => r
+  implicit val decoder: Decoder[Row] = Decoder.instance[Row](r => r)
 
   "CassandraClient.execute() With Recursion" should {
     "Return Two Records" in {
