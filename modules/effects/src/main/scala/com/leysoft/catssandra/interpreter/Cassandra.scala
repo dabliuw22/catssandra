@@ -19,8 +19,8 @@ object Cassandra {
     session: Session
   ) extends CassandraClient[F] {
 
-    override def command(command: Command): F[Unit] =
-      async(command.value).void
+    override def command(command: Command): F[Int] =
+      async(command.value).flatMap(rec).map(_.size)
 
     override def execute[A](
       query: Query
@@ -81,7 +81,7 @@ object Cassandra {
       Async[F].delay(new AsyncCassandraClient(session))
   }
 
-  def apply[F[_]: Async: ContextShift](
+  def make[F[_]: Async: ContextShift](
     session: Session
   ): F[CassandraClient[F]] =
     AsyncCassandraClient.make[F](session)

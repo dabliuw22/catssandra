@@ -5,7 +5,7 @@ import fs2.Stream
 
 trait CassandraClient[F[_]] {
 
-  def command(command: Command): F[Unit]
+  def command(command: Command): F[Int]
 
   def execute[A](query: Query)(implicit decoder: Decoder[A]): F[List[A]]
 

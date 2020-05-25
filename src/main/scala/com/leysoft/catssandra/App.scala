@@ -25,11 +25,12 @@ object App extends IOApp {
   }
 
   override def run(args: List[String]): IO[ExitCode] =
-    Session.apply[IO]().use { session =>
+    Session.resource[IO]().use { session =>
       for {
-        client <- Cassandra.apply[IO](session)
-        _ <- client
-              .command(command(UUID.randomUUID().toString, "p22", 100))
+        client <- Cassandra.make[IO](session)
+        insert <- client
+                   .command(command(UUID.randomUUID().toString, "p22", 100))
+        _ <- logger.info(s"INSERT: $insert")
         all <- client.execute[Product](queryAll)
         _ <- logger.info(s"ALL: $all")
         stream <- client.stream[Product](queryAll).compile.toList
@@ -49,6 +50,8 @@ object App extends IOApp {
 
   def command(id: String, name: String, stock: Float): Command =
     cql(
-      s"INSERT INTO test.products(id, name, stock) VALUES ('$id', '$name', $stock)"
+      s"""INSERT INTO test.products(id, name, stock)
+         |VALUES ('$id', '$name', $stock)
+         |IF NOT EXISTS""".stripMargin
     ).command
 }

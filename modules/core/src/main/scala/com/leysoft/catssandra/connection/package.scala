@@ -37,7 +37,7 @@ package object connection {
 
   object Session {
 
-    def apply[F[_]: Async: ContextShift](
+    def resource[F[_]: Async: ContextShift](
       keyspace: Option[String] = None,
       credentials: Option[Credentials] = None,
       datacenter: (String, List[Node]) = ("datacenter1", List(Node()))

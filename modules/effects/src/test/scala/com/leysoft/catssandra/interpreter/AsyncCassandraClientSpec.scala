@@ -12,7 +12,7 @@ protected[interpreter] final class AsyncCassandraClientSpec extends AsyncSpec {
   "CassandraClient.execute() With Recursion" should {
     "Return Two Records" in {
       Cassandra
-        .apply[IO](sessionRec)
+        .make[IO](sessionRec)
         .flatMap(
           client =>
             client.execute[String](cql("SELECT test FROM test.tests").query)
@@ -25,7 +25,7 @@ protected[interpreter] final class AsyncCassandraClientSpec extends AsyncSpec {
   "CassandraClient.execute() With Recursion" should {
     "Return One Records" in {
       Cassandra
-        .apply[IO](session)
+        .make[IO](session)
         .flatMap(
           client =>
             client.execute[String](cql("SELECT test FROM test.tests").query)
@@ -38,7 +38,7 @@ protected[interpreter] final class AsyncCassandraClientSpec extends AsyncSpec {
   "CassandraClient.stream() With Recursion" should {
     "Return Two Records" in {
       fs2.Stream
-        .eval(Cassandra.apply[IO](sessionRec))
+        .eval(Cassandra.make[IO](sessionRec))
         .flatMap(
           client =>
             client.stream[String](cql("SELECT test FROM test.tests").query)
@@ -53,7 +53,7 @@ protected[interpreter] final class AsyncCassandraClientSpec extends AsyncSpec {
   "CassandraClient.stream() With Recursion" should {
     "Return One Records" in {
       fs2.Stream
-        .eval(Cassandra.apply[IO](session))
+        .eval(Cassandra.make[IO](session))
         .flatMap(
           client =>
             client.stream[String](cql("SELECT test FROM test.tests").query)
