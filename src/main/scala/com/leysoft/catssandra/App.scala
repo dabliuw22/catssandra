@@ -31,8 +31,8 @@ object App extends IOApp {
         insert <- client
                    .command(command(UUID.randomUUID().toString, "p22", 100))
         _ <- logger.info(s"INSERT: $insert")
-        all <- client.execute[Product](queryAll)
-        _ <- logger.info(s"ALL: $all")
+        greaterThan <- client.execute[Product](queryGreaterThan(100))
+        _ <- logger.info(s"GREATER THAN: $greaterThan")
         stream <- client.stream[Product](queryAll).compile.toList
         _ <- logger.info(s"STREAM: $stream")
         option <- client
@@ -45,8 +45,14 @@ object App extends IOApp {
 
   def queryAll: Query = cql("SELECT * FROM test.products").query
 
+  def queryGreaterThan(stock: Float): Query =
+    cql(s"""SELECT * FROM test.products
+       |WHERE stock > $stock
+       |ALLOW FILTERING""".stripMargin).query
+
   def queryOne(id: String): Query =
-    cql(s"SELECT * FROM test.products WHERE id = '$id'").query
+    cql(s"""SELECT * FROM test.products
+         |WHERE id = '$id'""".stripMargin).query
 
   def command(id: String, name: String, stock: Float): Command =
     cql(
