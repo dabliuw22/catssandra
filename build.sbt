@@ -1,4 +1,4 @@
-import Dependencies._
+import Dependencies.{Libraries, _}
 
 lazy val commonSettings = Seq(
   version := "0.0.1",
@@ -40,16 +40,21 @@ lazy val core = (project in file("modules/core"))
       Libraries.datastaxCore,
       Libraries.scalaLogging,
       Libraries.logbackClassic,
-      Libraries.Testing.scalaTest,
-      Libraries.Testing.scalaCheck,
-      Libraries.Testing.scalaTestPlus,
-      Libraries.Testing.scalaCheckToolboxMagic,
-      Libraries.Testing.scalaCheckToolboxDatetime,
-      Libraries.Testing.scalaCheckToolboxCombinators
+      Libraries.Testing.scalaTest % Test,
+      Libraries.Testing.scalaCheck % Test,
+      Libraries.Testing.scalaTestPlus % Test,
+      Libraries.Testing.scalaCheckToolboxMagic % Test,
+      Libraries.Testing.scalaCheckToolboxDatetime % Test,
+      Libraries.Testing.scalaCheckToolboxCombinators % Test
     )
   ).dependsOn(test)
 
 lazy val effects = (project in file("modules/effects"))
+  .configs(IntegrationTest)
+  .settings(inConfig(IntegrationTest)(Defaults.itSettings))
+  .settings(inConfig(IntegrationTest)(ScalafmtPlugin.scalafmtConfigSettings))
+  .configs(Test)
+  .settings(inConfig(Test)(Defaults.testSettings))
   .settings(commonSettings: _*)
   .settings(
     name := "catssandra-effects",
@@ -65,12 +70,13 @@ lazy val effects = (project in file("modules/effects"))
       Libraries.logbackClassic,
       Libraries.log4CatsCore,
       Libraries.log4CatsSlf4j,
-      Libraries.Testing.scalaTest,
-      Libraries.Testing.scalaCheck,
-      Libraries.Testing.scalaTestPlus,
-      Libraries.Testing.scalaCheckToolboxMagic,
-      Libraries.Testing.scalaCheckToolboxDatetime,
-      Libraries.Testing.scalaCheckToolboxCombinators
+      Libraries.Testing.scalaTest % Test,
+      Libraries.Testing.scalaCheck % Test,
+      Libraries.Testing.scalaTestPlus % Test,
+      Libraries.Testing.scalaCheckToolboxMagic % Test,
+      Libraries.Testing.scalaCheckToolboxDatetime % Test,
+      Libraries.Testing.scalaCheckToolboxCombinators % Test,
+      Libraries.Testing.scalaTestContainersCassandra % IntegrationTest
     )
   )
   .dependsOn(core, test)
@@ -83,11 +89,13 @@ lazy val test = (project in file("modules/test"))
     libraryDependencies ++= Seq(
       Libraries.catsCore,
       Libraries.catsEffect,
+      Libraries.datastaxCore,
       Libraries.Testing.scalaTest,
       Libraries.Testing.scalaCheck,
       Libraries.Testing.scalaTestPlus,
       Libraries.Testing.scalaCheckToolboxMagic,
       Libraries.Testing.scalaCheckToolboxDatetime,
-      Libraries.Testing.scalaCheckToolboxCombinators
+      Libraries.Testing.scalaCheckToolboxCombinators,
+      Libraries.Testing.scalaTestContainersScalaTest
     )
   )

@@ -1,4 +1,4 @@
-package com.leysoft.catssandra
+package com.leysoft.catssandra.test
 
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 

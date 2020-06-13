@@ -54,8 +54,10 @@ package object connection {
               )
             credentials match {
               case Some(credentials) =>
-                cqlSession.withAuthCredentials(credentials.username,
-                                               credentials.password)
+                cqlSession.withAuthCredentials(
+                  credentials.username,
+                  credentials.password
+                )
               case _ => ()
             }
             keyspace match {

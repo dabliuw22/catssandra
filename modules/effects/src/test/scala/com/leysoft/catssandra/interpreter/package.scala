@@ -20,13 +20,15 @@ import com.leysoft.catssandra.connection.Session
 
 package object interpreter {
 
-  protected[interpreter] def sessionRec: Session = new Session {
-    override def cql: CqlSession = new FakeRecCqlSession
-  }
+  protected[interpreter] def sessionRec: Session =
+    new Session {
+      override def cql: CqlSession = new FakeRecCqlSession
+    }
 
-  protected[interpreter] def session: Session = new Session {
-    override def cql: CqlSession = new FakeCqlSession
-  }
+  protected[interpreter] def session: Session =
+    new Session {
+      override def cql: CqlSession = new FakeCqlSession
+    }
 
   private final class FakeRow extends Row with GettableByName {
 

@@ -15,7 +15,7 @@ import scala.jdk.CollectionConverters._
 
 object Cassandra {
 
-  private[catssandra] final class AsyncCassandraClient[F[_]: Async: ContextShift] private (
+  private class AsyncCassandraClient[F[_]: Async: ContextShift] private (
     session: Session
   ) extends CassandraClient[F] {
 

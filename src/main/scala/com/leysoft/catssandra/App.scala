@@ -29,16 +29,16 @@ object App extends IOApp {
       for {
         client <- Cassandra.make[IO](session)
         insert <- client
-                   .command(command(UUID.randomUUID().toString, "p22", 100))
+                    .command(command(UUID.randomUUID().toString, "p22", 100))
         _ <- logger.info(s"INSERT: $insert")
         greaterThan <- client.execute[Product](queryGreaterThan(100))
         _ <- logger.info(s"GREATER THAN: $greaterThan")
         stream <- client.stream[Product](queryAll).compile.toList
         _ <- logger.info(s"STREAM: $stream")
         option <- client
-                   .option[Product](
-                     queryOne("491ae396-42e7-4483-a3ef-e729c486980f")
-                   )
+                    .option[Product](
+                      queryOne("491ae396-42e7-4483-a3ef-e729c486980f")
+                    )
         _ <- logger.info(s"OPTION: $option")
       } yield ExitCode.Success
     }
