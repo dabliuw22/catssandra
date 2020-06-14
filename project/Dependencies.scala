@@ -16,7 +16,7 @@ object Dependencies {
       lazy val scalaCheck = "1.14.3"
       lazy val scalaCheckToolbox = "0.3.2"
       lazy val scalaTestPlus = "3.1.0.1"
-      lazy val scalaTestContainersVersion = "0.37.0"
+      lazy val testContainersVersion = "1.14.3"
     }
   }
 
@@ -41,7 +41,7 @@ object Dependencies {
 
     object Testing {
       private def scalaCheckToolbox(artifact: String): ModuleID = "com.47deg" %% artifact % Versions.Test.scalaCheckToolbox
-      private def scalaTestContainers(artifact: String): ModuleID = "com.dimafeng" %% artifact % Versions.Test.scalaTestContainersVersion
+      private def testContainers(artifact: String): ModuleID = "org.testcontainers" % artifact % Versions.Test.testContainersVersion
 
       lazy val scalaTest = "org.scalatest" %% "scalatest" % Versions.Test.scalaTest
       lazy val scalaCheck = "org.scalacheck" %% "scalacheck" % Versions.Test.scalaCheck
@@ -49,8 +49,8 @@ object Dependencies {
       lazy val scalaCheckToolboxDatetime = scalaCheckToolbox("scalacheck-toolbox-datetime")
       lazy val scalaCheckToolboxMagic = scalaCheckToolbox("scalacheck-toolbox-magic")
       lazy val scalaCheckToolboxCombinators = scalaCheckToolbox("scalacheck-toolbox-combinators")
-      lazy val scalaTestContainersScalaTest = scalaTestContainers("testcontainers-scala-scalatest")
-      lazy val scalaTestContainersCassandra = scalaTestContainers("testcontainers-scala-cassandra")
+      lazy val testContainersCore = testContainers("testcontainers")
+      lazy val testContainersCassandra = testContainers("cassandra")
     }
   }
 }

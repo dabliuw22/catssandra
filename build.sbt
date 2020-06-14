@@ -1,4 +1,4 @@
-import Dependencies.{Libraries, _}
+import Dependencies._
 
 lazy val commonSettings = Seq(
   version := "0.0.1",
@@ -76,7 +76,7 @@ lazy val effects = (project in file("modules/effects"))
       Libraries.Testing.scalaCheckToolboxMagic % Test,
       Libraries.Testing.scalaCheckToolboxDatetime % Test,
       Libraries.Testing.scalaCheckToolboxCombinators % Test,
-      Libraries.Testing.scalaTestContainersCassandra % IntegrationTest
+      Libraries.Testing.testContainersCassandra % IntegrationTest
     )
   )
   .dependsOn(core, test)
@@ -96,6 +96,7 @@ lazy val test = (project in file("modules/test"))
       Libraries.Testing.scalaCheckToolboxMagic,
       Libraries.Testing.scalaCheckToolboxDatetime,
       Libraries.Testing.scalaCheckToolboxCombinators,
-      Libraries.Testing.scalaTestContainersScalaTest
+      Libraries.Testing.testContainersCore,
+      Libraries.Testing.testContainersCassandra
     )
   )

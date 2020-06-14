@@ -1,12 +1,13 @@
 package com.leysoft.catssandra.interpreter
 
 import cats.effect.IO
+import com.leysoft.catssandra.interpreter.util._
 import com.leysoft.catssandra.syntax._
 import com.leysoft.catssandra.test.AsyncSpec
 
-protected[interpreter] final class AsyncCassandraClientSpec extends AsyncSpec {
+final class AsyncCassandraClientSpec extends AsyncSpec {
 
-  implicit val decoder: Decoder[String] =
+  private implicit val decoder: Decoder[String] =
     Decoder.instance[String](r => r.getString("test"))
 
   "CassandraClient.execute() With Recursion" should {

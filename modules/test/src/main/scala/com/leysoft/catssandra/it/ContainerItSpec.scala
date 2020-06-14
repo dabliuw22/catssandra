@@ -1,6 +1,9 @@
 package com.leysoft.catssandra.it
 
-import com.dimafeng.testcontainers.ForAllTestContainer
 import com.leysoft.catssandra.test.AsyncSpec
+import org.testcontainers.containers.CassandraContainer
 
-trait ContainerItSpec extends AsyncSpec with ForAllTestContainer
+trait ContainerItSpec extends AsyncSpec {
+
+  protected val container = new CassandraContainer()
+}

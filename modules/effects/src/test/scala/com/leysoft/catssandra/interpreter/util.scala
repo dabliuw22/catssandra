@@ -1,4 +1,4 @@
-package com.leysoft.catssandra
+package com.leysoft.catssandra.interpreter
 
 import java.lang
 import java.nio.ByteBuffer
@@ -18,14 +18,14 @@ import com.datastax.oss.driver.api.core.metrics.Metrics
 import com.datastax.oss.driver.api.core.session.Request
 import com.leysoft.catssandra.connection.Session
 
-package object interpreter {
+object util {
 
-  protected[interpreter] def sessionRec: Session =
+  def sessionRec: Session =
     new Session {
       override def cql: CqlSession = new FakeRecCqlSession
     }
 
-  protected[interpreter] def session: Session =
+  def session: Session =
     new Session {
       override def cql: CqlSession = new FakeCqlSession
     }
